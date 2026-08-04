@@ -1,8 +1,8 @@
 {
-  "name": "Restaurant Menu",
-  "short_name": "Restaurant",
-  "start_url": "/Restaurant-menu/index.html",
-  "scope": "/Restaurant-menu/",
+  "name": "ShawarMax Menu",
+  "short_name": "ShawarMax",
+  "start_url": "/ShawarMax-Menu/index.html",
+  "scope": "/ShawarMax-Menu/",
   "display": "standalone",
   "background_color": "#f8fafc",
   "theme_color": "#ef4444",
