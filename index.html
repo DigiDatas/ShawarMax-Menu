@@ -2489,7 +2489,7 @@ function toggleQuickCart(id) {
 
             // --- SMART GPS LOGIC ---
             // Only ask for location if they selected Delivery
-            if (diningType === 'Delivery' && navigator.geolocation) {
+           if (diningType === 'Takeaway' && navigator.geolocation) {
                 
                 // Temporarily change the button text to show it's loading the GPS
                 const btn = document.querySelector('button[onclick="sendOrderViaWhatsApp()"]');
