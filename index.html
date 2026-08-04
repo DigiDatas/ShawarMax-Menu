@@ -457,8 +457,8 @@
                 <div class="absolute inset-0 bg-gradient-to-b from-white/10 to-transparent pointer-events-none"></div>
                 
                 <!-- Big Round Logo Container -->
-                <div class="w-36 h-36 sm:w-44 sm:h-44 bg-white rounded-full p-4 shadow-2xl mb-4 relative z-10 flex items-center justify-center overflow-hidden">
-                    <img id="brandModalImage" src="" class="max-w-full max-h-full object-contain hover:scale-110 transition-transform duration-500" alt="Brand Logo">
+                <div class="w-36 h-36 sm:w-44 sm:h-44 bg-white rounded-full shadow-2xl mb-4 relative z-10 flex items-center justify-center overflow-hidden border-4 border-white">
+                    <img id="brandModalImage" src="" class="w-full h-full object-cover hover:scale-110 transition-transform duration-500" alt="Brand Logo">
                 </div>
                 
                 <!-- Centered Title under the Logo -->
@@ -831,14 +831,26 @@ let relatedItemsData = []; // (You did this perfectly!)
             document.documentElement.dir = currentLang === 'ar' ? 'rtl' : 'ltr';
             document.documentElement.lang = currentLang;
 
+            // Smart Bilingual Brand Name (Row 2 for EN, Row 3 for AR)
+            let smartBrandName = "Our Restaurant";
+            if (window.rawBrandRows && window.rawBrandRows.length > 1) {
+                if (currentLang === 'en') {
+                    smartBrandName = window.rawBrandRows[1]['B'] || "Our Restaurant";
+                } else {
+                    smartBrandName = (window.rawBrandRows.length > 2 && window.rawBrandRows[2]['B']) ? window.rawBrandRows[2]['B'] : (window.rawBrandRows[1]['B'] || "مطعمنا");
+                }
+            } else {
+                smartBrandName = rawBranding.B || (currentLang === 'en' ? "Our Restaurant" : "مطعمنا");
+            }
+
             // 1. Update the top navigation bar and bottom footer
-            document.getElementById('nav-title').textContent = rawBranding.B || "My Restaurant";
-            document.getElementById('footer-title').textContent = rawBranding.B || "My Restaurant";
+            document.getElementById('nav-title').textContent = smartBrandName;
+            document.getElementById('footer-title').textContent = smartBrandName;
             
-            // 2. FIX: Properly split the Hero Header so it says "Welcome to / [Brand Name]"
+            // 2. Properly split the Hero Header
             const welcomeText = currentLang === 'en' ? "Welcome to" : "مرحباً بكم في";
             document.getElementById('hero-title1').textContent = welcomeText;
-            document.getElementById('hero-title2').textContent = rawBranding.B || (currentLang === 'en' ? "Our Restaurant" : "مطعمنا");
+            document.getElementById('hero-title2').textContent = smartBrandName;
             
             document.getElementById('f-phone').textContent = rawBranding.C || "--";
             document.getElementById('f-whatsapp').textContent = rawBranding.D || "--";
@@ -1028,6 +1040,7 @@ let relatedItemsData = []; // (You did this perfectly!)
         function formatMenuData(rawSource) {
             activeMenuData = [];
             mainCategories = [];
+            allSubCategories = []; // <--- THIS CLEARS THE OLD LANGUAGE
             const subCatGroups = {};
 
             rawSource.forEach(row => {
@@ -2186,8 +2199,8 @@ let diningType = 'Takeaway';
                 `;
             }
         }
-      function setupDraggable(elementId) {
-            const slider = document.getElementById(elementId);
+      function setupDraggable(element) {
+            const slider = typeof element === 'string' ? document.getElementById(element) : element;
             if(!slider) return;
             let isDown = false;
             let startX;
@@ -2196,16 +2209,19 @@ let diningType = 'Takeaway';
             slider.addEventListener('mousedown', (e) => {
                 isDown = true;
                 slider.classList.add('cursor-grabbing');
+                slider.style.scrollSnapType = 'none'; // Disable snap while dragging
                 startX = e.pageX - slider.offsetLeft;
                 scrollLeft = slider.scrollLeft;
             });
             slider.addEventListener('mouseleave', () => {
                 isDown = false;
                 slider.classList.remove('cursor-grabbing');
+                slider.style.scrollSnapType = ''; // Restore snap
             });
             slider.addEventListener('mouseup', () => {
                 isDown = false;
                 slider.classList.remove('cursor-grabbing');
+                slider.style.scrollSnapType = ''; // Restore snap
             });
             slider.addEventListener('mousemove', (e) => {
                 if (!isDown) return;
@@ -2810,6 +2826,9 @@ function toggleQuickCart(id) {
                     
                     slider.dataset.infiniteSetup = "true";
                     slider.dataset.realCount = imgs.length;
+                    
+                    // Attach desktop dragging to all carousels automatically
+                    setupDraggable(slider);
 
                     // Kill old conflicting logic
                     slider.onscroll = null; 
@@ -2889,16 +2908,7 @@ function toggleQuickCart(id) {
         }
         setInterval(() => triggerAutoSwipe('.mini-img-slider'), 4000);
         setInterval(() => triggerAutoSwipe('.excel-banner-slider'), 5000);
-        // --- NEW: Infinite Swipe Loop for All Carousels ---
-        let carouselSwipeStartX = 0;
-
-        document.addEventListener('touchstart', (e) => {
-            const slider = e.target.closest('.mini-img-slider, .excel-banner-slider, #modal-image-slider, #promo-slider');
-            if (slider && slider.children.length > 1) {
-                carouselSwipeStartX = e.touches[0].clientX;
-            }
-        }, { passive: true });
-
+        
         document.addEventListener('touchend', (e) => {
             const slider = e.target.closest('.mini-img-slider, .excel-banner-slider, #modal-image-slider, #promo-slider');
             if (slider && slider.children.length > 1) {
@@ -2991,7 +3001,11 @@ function toggleQuickCart(id) {
             img.src = rawBranding.smartLogo || 'https://raw.githubusercontent.com/DigiDatas/ShawarMax-Menu/main/logo.png'; 
 
             // 2. Set Text Data from Excel
-            document.getElementById('brandModalTitle').textContent = rawBranding.B || "Our Restaurant";
+            let smartBrandName = "Our Restaurant";
+            if (window.rawBrandRows && window.rawBrandRows.length > 1) {
+                smartBrandName = currentLang === 'en' ? (window.rawBrandRows[1]['B'] || "Our Restaurant") : ((window.rawBrandRows.length > 2 && window.rawBrandRows[2]['B']) ? window.rawBrandRows[2]['B'] : (window.rawBrandRows[1]['B'] || "مطعمنا"));
+            }
+            document.getElementById('brandModalTitle').textContent = smartBrandName;
             
             const defaultDescEn = "Welcome to our restaurant! We pride ourselves on serving delicious, high-quality food made with fresh ingredients and authentic recipes.";
             const defaultDescAr = "مرحباً بكم في مطعمنا! نفخر بتقديم أشهى المأكولات عالية الجودة المحضرة بمكونات طازجة ووصفات أصيلة.";
