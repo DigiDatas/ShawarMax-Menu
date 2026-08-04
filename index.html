@@ -2488,41 +2488,38 @@ function toggleQuickCart(id) {
             msg += `*Net Total: ${netTotal.toFixed(2)} ${globalCurrency}*\n`;
 
             // --- SMART GPS LOGIC ---
-            // Only ask for location if they selected Delivery
-           if (diningType === 'Takeaway' && navigator.geolocation) {
+            if (diningType === 'Takeaway' && navigator.geolocation) {
                 
-                // Temporarily change the button text to show it's loading the GPS
                 const btn = document.querySelector('button[onclick="sendOrderViaWhatsApp()"]');
                 const originalText = btn.innerHTML;
                 btn.innerHTML = `<i class="fas fa-spinner fa-spin text-2xl"></i> Getting Location...`;
                 
                 navigator.geolocation.getCurrentPosition(
                     (position) => {
-                        // Success! Generate the Google Maps link
                         const lat = position.coords.latitude;
                         const lon = position.coords.longitude;
                         const mapLink = `https://www.google.com/maps?q=${lat},${lon}`;
                         
                         msg += `\n📍 *Customer Location:*\n${mapLink}\n`;
                         
-                        // Restore button and open WhatsApp
                         btn.innerHTML = originalText;
-                        window.open(`https://wa.me/${rawBranding.D}?text=${encodeURIComponent(msg)}`, '_blank');
                         closeCartModal();
+                        // FIX: Use location.href instead of window.open to bypass popup blockers!
+                        window.location.href = `https://wa.me/${rawBranding.D}?text=${encodeURIComponent(msg)}`;
                     },
                     (error) => {
-                        // If the user hits "Block" or GPS fails, send the order anyway without the link
                         msg += `\n📍 *Customer Location:* (Permission Denied/Please ask customer)\n`;
                         btn.innerHTML = originalText;
-                        window.open(`https://wa.me/${rawBranding.D}?text=${encodeURIComponent(msg)}`, '_blank');
                         closeCartModal();
+                        // FIX: Use location.href instead of window.open to bypass popup blockers!
+                        window.location.href = `https://wa.me/${rawBranding.D}?text=${encodeURIComponent(msg)}`;
                     },
                     { enableHighAccuracy: true, timeout: 10000, maximumAge: 0 }
                 );
             } else {
-                // If it's Store Pickup, just send the order instantly
-                window.open(`https://wa.me/${rawBranding.D}?text=${encodeURIComponent(msg)}`, '_blank');
                 closeCartModal();
+                // FIX: Use location.href instead of window.open to bypass popup blockers!
+                window.location.href = `https://wa.me/${rawBranding.D}?text=${encodeURIComponent(msg)}`;
             }
         }
 
