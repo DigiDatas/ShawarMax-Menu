@@ -2501,10 +2501,20 @@ function toggleQuickCart(id) {
             } else if (diningType === 'Takeaway') {
                 // Read whatever the user typed or pasted via GPS into the box
                 const addressInput = document.getElementById('delivery-address').value.trim();
+                
                 if (addressInput) {
                     locationText = `\n📍 *Delivery Address:*\n${addressInput}\n`;
                 } else {
-                    locationText = `\n📍 *Delivery Address:*\n(Not provided - please ask customer)\n`;
+                    // NEW: Smart confirmation if the address is empty
+                    const proceedWithoutAddress = confirm("You haven't entered a delivery address. Do you want to send the order anyway and share your location directly in WhatsApp?");
+                    
+                    if (!proceedWithoutAddress) {
+                        // User clicked Cancel, stop the order process so they can type it
+                        return; 
+                    }
+                    
+                    // User clicked OK, proceed with the order
+                    locationText = `\n📍 *Delivery Address:*\n(Will share via WhatsApp)\n`;
                 }
             }
 
