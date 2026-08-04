@@ -1,40 +1,28 @@
-const CACHE_NAME = 'shawarmax-menu-v1'; // Changed to v1 for the new client
-
-const URLS_TO_CACHE = [
-  '/ShawarMax-Menu/',
-  '/ShawarMax-Menu/index.html',
-  '/ShawarMax-Menu/manifest.json',
-  '/ShawarMax-Menu/logo.png'
-];
-
-self.addEventListener('install', (event) => {
-  event.waitUntil(
-    caches.open(CACHE_NAME)
-      .then((cache) => {
-        return cache.addAll(URLS_TO_CACHE);
-      })
-  );
+// 1. Inside the INSTALL event
+self.addEventListener('install', event => {
+    self.skipWaiting(); // Forces the new service worker to activate immediately!
+    
+    event.waitUntil(
+        caches.open(CACHE_NAME)
+            .then(cache => {
+                return cache.addAll(urlsToCache);
+            })
+    );
 });
 
-self.addEventListener('fetch', (event) => {
-  event.respondWith(
-    caches.match(event.request)
-      .then((response) => {
-        return response || fetch(event.request);
-      })
-  );
-});
-
-self.addEventListener('activate', (event) => {
-  event.waitUntil(
-    caches.keys().then((cacheNames) => {
-      return Promise.all(
-        cacheNames.map((cacheName) => {
-          if (cacheName !== CACHE_NAME) {
-            return caches.delete(cacheName);
-          }
+// 2. Inside the ACTIVATE event
+self.addEventListener('activate', event => {
+    event.waitUntil(self.clients.claim()); // Forces the new service worker to take control of the page immediately!
+    
+    event.waitUntil(
+        caches.keys().then(cacheNames => {
+            return Promise.all(
+                cacheNames.map(cacheName => {
+                    if (cacheName !== CACHE_NAME) {
+                        return caches.delete(cacheName);
+                    }
+                })
+            );
         })
-      );
-    })
-  );
+    );
 });
