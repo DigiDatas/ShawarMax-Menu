@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Restaurant Menu</title>
+    <title>Shawar Max Menu</title>
   <link rel="manifest" href="manifest.json">
     <meta name="theme-color" content="#ef4444">
     <link rel="apple-touch-icon" href="logo.png">
@@ -2457,27 +2457,17 @@ function toggleQuickCart(id) {
         function sendOrderViaWhatsApp() {
             if(cart.length === 0 || !rawBranding.D) return;
             
-            const restaurantName = rawBranding.B || 'Our Restaurant';
+            const restaurantName = rawBranding.B || 'Our Store';
             
-            // --- NEW: Grab current date/time for the receipt ---
             const orderDate = new Date().toLocaleString('en-US', { 
                 day: '2-digit', month: 'short', year: 'numeric', hour: 'numeric', minute: '2-digit' 
             });
             
-            // Build the formatted text receipt using the new Dining Option variable
             let orderTypeStr = diningType;
-            if (diningType === 'Dine In') {
-                if (!selectedTable) {
-                    alert('Please select a table number from the dropdown!');
-                    return;
-                }
-                orderTypeStr = `Dine In (${selectedTable})`;
-            }
 
-            // Build the formatted text receipt
             let msg = `🧾 *NEW ORDER*\n`;
             msg += `📅 Date: ${orderDate}\n`;
-            msg += `📍 Restaurant: *${restaurantName}*\n`;
+            msg += `📍 Store: *${restaurantName}*\n`;
             msg += `🍽️ Option: *${orderTypeStr}*\n`;
             msg += `------------------------\n`;
             
@@ -2497,9 +2487,43 @@ function toggleQuickCart(id) {
             msg += `VAT (15%): ${vatAmount.toFixed(2)}\n`;
             msg += `*Net Total: ${netTotal.toFixed(2)} ${globalCurrency}*\n`;
 
-            // Redirect to WhatsApp
-            window.open(`https://wa.me/${rawBranding.D}?text=${encodeURIComponent(msg)}`, '_blank');
-            closeCartModal(); // Automatically close the bill
+            // --- SMART GPS LOGIC ---
+            // Only ask for location if they selected Delivery
+            if (diningType === 'Delivery' && navigator.geolocation) {
+                
+                // Temporarily change the button text to show it's loading the GPS
+                const btn = document.querySelector('button[onclick="sendOrderViaWhatsApp()"]');
+                const originalText = btn.innerHTML;
+                btn.innerHTML = `<i class="fas fa-spinner fa-spin text-2xl"></i> Getting Location...`;
+                
+                navigator.geolocation.getCurrentPosition(
+                    (position) => {
+                        // Success! Generate the Google Maps link
+                        const lat = position.coords.latitude;
+                        const lon = position.coords.longitude;
+                        const mapLink = `https://www.google.com/maps?q=${lat},${lon}`;
+                        
+                        msg += `\n📍 *Customer Location:*\n${mapLink}\n`;
+                        
+                        // Restore button and open WhatsApp
+                        btn.innerHTML = originalText;
+                        window.open(`https://wa.me/${rawBranding.D}?text=${encodeURIComponent(msg)}`, '_blank');
+                        closeCartModal();
+                    },
+                    (error) => {
+                        // If the user hits "Block" or GPS fails, send the order anyway without the link
+                        msg += `\n📍 *Customer Location:* (Permission Denied/Please ask customer)\n`;
+                        btn.innerHTML = originalText;
+                        window.open(`https://wa.me/${rawBranding.D}?text=${encodeURIComponent(msg)}`, '_blank');
+                        closeCartModal();
+                    },
+                    { enableHighAccuracy: true, timeout: 10000, maximumAge: 0 }
+                );
+            } else {
+                // If it's Store Pickup, just send the order instantly
+                window.open(`https://wa.me/${rawBranding.D}?text=${encodeURIComponent(msg)}`, '_blank');
+                closeCartModal();
+            }
         }
 
         // --- REWORKED: DEDICATED CATEGORY POPUP LOGIC ---
