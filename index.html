@@ -1901,7 +1901,7 @@ document.getElementById('modalPrice').innerHTML = priceHtml;
                         relatedSlider.innerHTML += `
                             <div class="relative w-[28vw] sm:w-[110px] flex-shrink-0 snap-start bg-orange-50 border border-orange-100 rounded-xl p-2 shadow-sm cursor-pointer hover:shadow-md transition-shadow">
                                 <div onclick="openModal('${relItem.id}')">
-                                    <img src="${relItem.img}" class="w-full h-16 object-cover rounded-lg mb-1.5">
+                                    <img src="${relItem.img}" class="w-full h-16 object-cover rounded-lg mb-1.5" onerror="if(this.src.includes('.jpg')) { this.src=this.src.replace('.jpg', '.png'); } else if(this.src.includes('.png')) { this.src=this.src.replace('.png', '.jpeg'); } else { this.onerror=null; this.src='${rawBranding.smartLogo || 'https://raw.githubusercontent.com/DigiDatas/ShawarMax-Menu/main/logo.png'}'; }">
                                     <h4 class="text-[10px] font-bold text-gray-800 line-clamp-1">${relItem.name}</h4>
                                 </div>
                                 <div class="flex justify-between items-center mt-1">
