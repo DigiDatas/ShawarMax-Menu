@@ -31,7 +31,7 @@
       "J": "",
       "K": "SR",
       "L": "English&Arabic",
-      "M": "3SR/3km",
+      "M": "3 Riyal/3 Km",
       "N": "https://raw.githubusercontent.com/DigiDatas/ShawarMax-Menu/main/logo.png",
       "O": "https://raw.githubusercontent.com/Rmoosa2014/Restaurant-menu/main/images/banner/Banner01.jpg,https://raw.githubusercontent.com/Rmoosa2014/Restaurant-menu/main/images/banner/Banner02.jpg",
       "P": true
@@ -203,7 +203,7 @@
       "H": 460,
       "I": "",
       "J": "Today Special",
-      "K": "https://raw.githubusercontent.com/Rmoosa2014/Restaurant-menu/main/images/ItemImages/ITM023.jpg,https://raw.githubusercontent.com/Rmoosa2014/Restaurant-menu/main/images/ItemImages/ITM024.jpg,https://raw.githubusercontent.com/Rmoosa2014/Restaurant-menu/main/images/ItemImages/ITM001.jpg",
+      "K": "ITM002.jpg",
       "L": "",
       "M": "",
       "N": ""
@@ -251,7 +251,7 @@
       "H": 1023,
       "I": "",
       "J": "",
-      "K": "ITM006.jpg",
+      "K": "ITM005.jpg",
       "L": "",
       "M": "",
       "N": "https://raw.githubusercontent.com/Rmoosa2014/Restaurant-menu/main/images/FlashCard/FlashCard.jpg"
@@ -267,7 +267,7 @@
       "H": 625,
       "I": "",
       "J": "Today Special",
-      "K": "ITM005.jpg,ITM005-2.jpg",
+      "K": "ITM006.jpg",
       "L": "",
       "M": "",
       "N": "https://raw.githubusercontent.com/Rmoosa2014/Restaurant-menu/main/images/FlashCard/FlashCard03.jpg"
@@ -347,7 +347,7 @@
       "H": "",
       "I": "",
       "J": "",
-      "K": "ITM001.jpg",
+      "K": "ITM011.jpg",
       "L": "",
       "M": "",
       "N": ""
@@ -363,7 +363,7 @@
       "H": "",
       "I": "",
       "J": "",
-      "K": "ITM001.jpg",
+      "K": "ITM012.jpg",
       "L": "",
       "M": "",
       "N": ""
@@ -379,7 +379,7 @@
       "H": "",
       "I": "",
       "J": "",
-      "K": "ITM001.jpg",
+      "K": "ITM013.jpg",
       "L": "",
       "M": "",
       "N": ""
@@ -395,7 +395,7 @@
       "H": "",
       "I": "",
       "J": "",
-      "K": "ITM001.jpg",
+      "K": "ITM014.jpg",
       "L": "",
       "M": "",
       "N": ""
@@ -411,7 +411,7 @@
       "H": "",
       "I": "",
       "J": "",
-      "K": "ITM001.jpg",
+      "K": "ITM015.jpg",
       "L": "",
       "M": "",
       "N": ""
@@ -427,7 +427,7 @@
       "H": "",
       "I": "",
       "J": "",
-      "K": "ITM001.jpg",
+      "K": "ITM016.jpg",
       "L": "",
       "M": "",
       "N": ""
@@ -443,7 +443,7 @@
       "H": "",
       "I": "",
       "J": "",
-      "K": "ITM001.jpg",
+      "K": "ITM017.jpg",
       "L": "",
       "M": "",
       "N": ""
@@ -459,39 +459,7 @@
       "H": "",
       "I": "",
       "J": "",
-      "K": "ITM001.jpg",
-      "L": "",
-      "M": "",
-      "N": ""
-    },
-    {
-      "A": "",
-      "B": "",
-      "C": "",
-      "D": "",
-      "E": "",
-      "F": "",
-      "G": "",
-      "H": "",
-      "I": "",
-      "J": "",
-      "K": "ITM001.jpg",
-      "L": "",
-      "M": "",
-      "N": ""
-    },
-    {
-      "A": "",
-      "B": "",
-      "C": "",
-      "D": "",
-      "E": "",
-      "F": "",
-      "G": "",
-      "H": "",
-      "I": "",
-      "J": "",
-      "K": "ITM001.jpg",
+      "K": "ITM018.jpg",
       "L": "",
       "M": "",
       "N": ""
@@ -541,7 +509,7 @@
       "H": 460,
       "I": "",
       "J": "Today Special",
-      "K": "https://raw.githubusercontent.com/Rmoosa2014/Restaurant-menu/main/images/ItemImages/ITM023.jpg,https://raw.githubusercontent.com/Rmoosa2014/Restaurant-menu/main/images/ItemImages/ITM024.jpg,https://raw.githubusercontent.com/Rmoosa2014/Restaurant-menu/main/images/ItemImages/ITM001.jpg",
+      "K": "ITM002.jpg",
       "L": "",
       "M": "",
       "N": ""
@@ -589,7 +557,7 @@
       "H": 1023,
       "I": "",
       "J": "",
-      "K": "ITM006.jpg",
+      "K": "ITM005.jpg",
       "L": "",
       "M": "",
       "N": "https://raw.githubusercontent.com/Rmoosa2014/Restaurant-menu/main/images/FlashCard/FlashCard.jpg"
@@ -605,7 +573,7 @@
       "H": 625,
       "I": "",
       "J": "Today Special",
-      "K": "ITM005.jpg,ITM005-2.jpg",
+      "K": "ITM006.jpg",
       "L": "",
       "M": "",
       "N": "https://raw.githubusercontent.com/Rmoosa2014/Restaurant-menu/main/images/FlashCard/FlashCard03.jpg"
@@ -685,7 +653,7 @@
       "H": "",
       "I": "",
       "J": "",
-      "K": "",
+      "K": "ITM011.jpg",
       "L": "",
       "M": "",
       "N": ""
@@ -701,7 +669,7 @@
       "H": "",
       "I": "",
       "J": "",
-      "K": "",
+      "K": "ITM012.jpg",
       "L": "",
       "M": "",
       "N": ""
@@ -717,7 +685,7 @@
       "H": "",
       "I": "",
       "J": "",
-      "K": "",
+      "K": "ITM013.jpg",
       "L": "",
       "M": "",
       "N": ""
@@ -733,7 +701,7 @@
       "H": "",
       "I": "",
       "J": "",
-      "K": "",
+      "K": "ITM014.jpg",
       "L": "",
       "M": "",
       "N": ""
@@ -749,7 +717,7 @@
       "H": "",
       "I": "",
       "J": "",
-      "K": "",
+      "K": "ITM015.jpg",
       "L": "",
       "M": "",
       "N": ""
@@ -765,7 +733,7 @@
       "H": "",
       "I": "",
       "J": "",
-      "K": "",
+      "K": "ITM016.jpg",
       "L": "",
       "M": "",
       "N": ""
@@ -781,7 +749,7 @@
       "H": "",
       "I": "",
       "J": "",
-      "K": "",
+      "K": "ITM017.jpg",
       "L": "",
       "M": "",
       "N": ""
@@ -797,7 +765,7 @@
       "H": "",
       "I": "",
       "J": "",
-      "K": "",
+      "K": "ITM018.jpg",
       "L": "",
       "M": "",
       "N": ""
