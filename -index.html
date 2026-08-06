@@ -653,6 +653,7 @@
 
       
         // --- Core State ---
+const CUSTOMER_ID = "CS01-2026-08";
       let rawBranding = {};
 let rawOffers = [];
 let rawMenuEn = [];
@@ -700,6 +701,46 @@ let relatedItemsData = []; // (You did this perfectly!)
         /// --- Master Initialization (JSON Upgraded) ---
         async function init() {
             try {
+                // ==========================================
+                // 🔒 NEW: CLOUD SECURITY KILL-SWITCH
+                // ==========================================
+                try {
+                    const authUrl = "https://raw.githubusercontent.com/Rmoosa2014/Restaurant-menu/main/images/CustomerID.json?v=" + new Date().getTime();
+                    const authResponse = await fetch(authUrl);
+                    if (!authResponse.ok) throw new Error("Cannot reach security server");
+                    
+                    const authData = await authResponse.json();
+                    let isValidCustomer = false;
+                    
+                    // Search all sheets in the Security JSON for the Customer ID
+                    for (const sheet in authData) {
+                        const rows = authData[sheet];
+                        if (Array.isArray(rows)) {
+                            // Find row where Column C matches our ID
+                            const match = rows.find(row => String(row.C || "").trim() === String(CUSTOMER_ID).trim());
+                            
+                            // Check if matched row exists and Column E says "Active"
+                            if (match && String(match.E || "").trim().toLowerCase() === "active") {
+                                isValidCustomer = true;
+                                break;
+                            }
+                        }
+                    }
+
+                    if (!isValidCustomer) throw new Error("Not Active");
+
+                } catch (authError) {
+                    // Triggers if fetch fails, file is missing, ID is wrong, or status is not Active
+                    document.body.innerHTML = `
+                        <div style="display:flex; flex-direction:column; justify-content:center; align-items:center; height:100vh; background-color:#f8fafc; font-family:sans-serif; color:#ef4444; text-align:center; padding: 20px;">
+                            <i class="fas fa-store-slash text-6xl mb-4 text-gray-300"></i>
+                            <h2 class="text-3xl font-extrabold text-gray-800">Temporarily Not Available</h2>
+                            <p class="text-gray-500 mt-2 font-bold">This menu is currently inactive. Please contact the administrator.</p>
+                        </div>`;
+                    return; // Completely stops the app from loading!
+                }
+                // ==========================================
+
                 // Point directly to the JSON file
                 const fileUrl = "MenuMasterData.json?v=" + new Date().getTime();
                 const response = await fetch(fileUrl);
