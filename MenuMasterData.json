@@ -116,47 +116,11 @@
       "C": "Description",
       "D": "Price Before",
       "E": "Price After",
-      "F": "Image"
-    },
-    {
-      "A": 1,
-      "B": "10% Discount",
-      "C": "get flat 10% discount on Sunday Only",
-      "D": 115,
-      "E": 103,
-      "F": ""
-    },
-    {
-      "A": 2,
-      "B": "20% Discount",
-      "C": "get flat 20% discount on Weekends Only",
-      "D": 55,
-      "E": 20,
-      "F": "https://raw.githubusercontent.com/Rmoosa2014/Restaurant-menu/main/images/Offer/Offer01.jpg"
-    },
-    {
-      "A": 3,
-      "B": "50% Discount",
-      "C": "get flat 50% discount on Mondayy Only",
-      "D": 10,
-      "E": 5,
-      "F": ""
-    },
-    {
-      "A": 4,
-      "B": "30% Discount",
-      "C": "get flat 30% discount on Wed-Thu Only",
-      "D": 200,
-      "E": 100,
-      "F": "https://raw.githubusercontent.com/Rmoosa2014/Restaurant-menu/main/images/Offer/Offer02.jpg"
-    },
-    {
-      "A": 5,
-      "B": "70% Discount",
-      "C": "get flat 70% discount on Friday Only",
-      "D": 65,
-      "E": 30,
-      "F": ""
+      "F": "Image",
+      "G": "",
+      "H": "",
+      "I": "",
+      "J": ""
     }
   ],
   "Menu-English": [
@@ -190,7 +154,7 @@
       "K": "ITM001.jpg",
       "L": "",
       "M": "https://www.instagram.com,https://maps.app.goo.gl/Sw5YC2koQuxJbZq57",
-      "N": "https://raw.githubusercontent.com/Rmoosa2014/Restaurant-menu/main/images/FlashCard/FlashCard04.jpg"
+      "N": ""
     },
     {
       "A": "ITM002",
@@ -254,7 +218,7 @@
       "K": "ITM005.jpg",
       "L": "",
       "M": "https://www.instagram.com,https://maps.app.goo.gl/Sw5YC2koQuxJbZq57",
-      "N": "https://raw.githubusercontent.com/Rmoosa2014/Restaurant-menu/main/images/FlashCard/FlashCard.jpg"
+      "N": ""
     },
     {
       "A": "ITM006",
@@ -270,7 +234,7 @@
       "K": "ITM006.jpg",
       "L": "",
       "M": "https://www.instagram.com,https://maps.app.goo.gl/Sw5YC2koQuxJbZq57",
-      "N": "https://raw.githubusercontent.com/Rmoosa2014/Restaurant-menu/main/images/FlashCard/FlashCard03.jpg"
+      "N": ""
     },
     {
       "A": "ITM007",
@@ -496,7 +460,7 @@
       "K": "ITM001.jpg",
       "L": "",
       "M": "https://www.instagram.com,https://maps.app.goo.gl/Sw5YC2koQuxJbZq57",
-      "N": "https://raw.githubusercontent.com/Rmoosa2014/Restaurant-menu/main/images/FlashCard/FlashCard04.jpg"
+      "N": ""
     },
     {
       "A": "ITM002",
@@ -560,7 +524,7 @@
       "K": "ITM005.jpg",
       "L": "",
       "M": "https://www.instagram.com,https://maps.app.goo.gl/Sw5YC2koQuxJbZq57",
-      "N": "https://raw.githubusercontent.com/Rmoosa2014/Restaurant-menu/main/images/FlashCard/FlashCard.jpg"
+      "N": ""
     },
     {
       "A": "ITM006",
@@ -576,7 +540,7 @@
       "K": "ITM006.jpg",
       "L": "",
       "M": "https://www.instagram.com,https://maps.app.goo.gl/Sw5YC2koQuxJbZq57",
-      "N": "https://raw.githubusercontent.com/Rmoosa2014/Restaurant-menu/main/images/FlashCard/FlashCard03.jpg"
+      "N": ""
     },
     {
       "A": "ITM007",
