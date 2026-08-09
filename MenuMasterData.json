@@ -19,7 +19,7 @@
       "P": "Game"
     },
     {
-      "A": "1",
+      "A": 1,
       "B": "ShawarMax",
       "C": "966 55 092 4124",
       "D": "966 55 092 4124",
@@ -34,10 +34,10 @@
       "M": "3 Riyal Around 3 Km",
       "N": "https://raw.githubusercontent.com/DigiDatas/ShawarMax-Menu/main/logo.png",
       "O": "https://raw.githubusercontent.com/DigiDatas/ShawarMax-Menu/main/images/banner/Banner01.jpg,https://raw.githubusercontent.com/DigiDatas/ShawarMax-Menu/main/images/banner/Banner02.jpg",
-      "P": "TRUE"
+      "P": true
     },
     {
-      "A": "2",
+      "A": 2,
       "B": "شاور ماكس",
       "C": "",
       "D": "",
@@ -107,24 +107,6 @@
       "N": "",
       "O": "Banner05.jpg",
       "P": ""
-    },
-    {
-      "A": "",
-      "B": "",
-      "C": "",
-      "D": "",
-      "E": "",
-      "F": "",
-      "G": "",
-      "H": "",
-      "I": "",
-      "J": "",
-      "K": "",
-      "L": "",
-      "M": "",
-      "N": "",
-      "O": "",
-      "P": "\u0000"
     }
   ],
   "SpecialOffer": [
@@ -134,11 +116,31 @@
       "C": "Description",
       "D": "Price Before",
       "E": "Price After",
-      "F": "Image",
-      "G": "",
-      "H": "",
-      "I": "",
-      "J": ""
+      "F": "Image"
+    },
+    {
+      "A": 1,
+      "B": "Buy 1 Get 1 FREE",
+      "C": "Opening day Offer",
+      "D": "",
+      "E": "",
+      "F": "https://raw.githubusercontent.com/DigiDatas/ShawarMax-Menu/main/images/Offer/Offer01.jpg"
+    },
+    {
+      "A": 2,
+      "B": "Buy 1 Get 1 FREE",
+      "C": "Opening day Offer",
+      "D": "",
+      "E": "",
+      "F": "https://raw.githubusercontent.com/DigiDatas/ShawarMax-Menu/main/images/Offer/Offer01.jpg"
+    },
+    {
+      "A": 3,
+      "B": "Buy 1 Get 1 FREE",
+      "C": "Opening day Offer",
+      "D": "",
+      "E": "",
+      "F": ""
     }
   ],
   "Menu-English": [
