@@ -2043,41 +2043,81 @@ document.getElementById('modalPrice').innerHTML = priceHtml;
         }
 
         function openWhatsApp() {
-            if(rawBranding.D) window.open(`https://wa.me/${rawBranding.D}`, '_blank');
+            if (rawBranding.D) {
+                // Clean the phone number (remove any spaces, plus signs, or dashes)
+                let phone = String(rawBranding.D).replace(/\D/g, '');
+                // Use the universal API link format that works on all mobile devices
+                window.open(`https://api.whatsapp.com/send?phone=${phone}`, '_blank');
+            }
         }
 
         function openWhatsAppItem() {
-            if(!currentOpenItemId || !rawBranding.D) return;
+            if (!currentOpenItemId || !rawBranding.D) return;
             const item = activeMenuData.find(i => i.id === currentOpenItemId);
             const text = currentLang === 'en' 
                 ? `Hi, I would like to order: ${item.name} (${item.price}${globalCurrency})`
                 : `مرحباً، أود طلب: ${item.name} (${item.price}${globalCurrency})`;
-            window.open(`https://wa.me/${rawBranding.D}?text=${encodeURIComponent(text)}`, '_blank');
-        }
-function smartWhatsAppOrder() {
-            if (cart.length > 0) {
-                const isAlreadyInCart = cart.some(c => String(c.id) === String(currentOpenItemId));
-                
-                if (!isAlreadyInCart) {
-                    addToCart();
-                }
-                
-                openCartModal();
-            } else {
-                openWhatsAppItem();
-            }
-        }        function shareItem() {
-            if (!currentOpenItemId) return;
-            const item = activeMenuData.find(i => i.id === currentOpenItemId);
-            const text = currentLang === 'en' 
-                ? `Check out ${item.name} at ${rawBranding.B || 'our restaurant'}! \n${window.location.href}`
-                : `شاهد ${item.name} في ${rawBranding.B || 'مطعمنا'}! \n${window.location.href}`;
             
-            if (navigator.share) {
-                navigator.share({ title: item.name, text: text }).catch(console.error);
-            } else {
-                window.open(`https://wa.me/?text=${encodeURIComponent(text)}`, '_blank');
+            let phone = String(rawBranding.D).replace(/\D/g, '');
+            window.open(`https://api.whatsapp.com/send?phone=${phone}&text=${encodeURIComponent(text)}`, '_blank');
+        }
+
+        function sendOrderViaWhatsApp() {
+            if(cart.length === 0 || !rawBranding.D) return;
+            
+            const restaurantName = rawBranding.B || 'Our Store';
+            const orderDate = new Date().toLocaleString('en-US', { 
+                day: '2-digit', month: 'short', year: 'numeric', hour: 'numeric', minute: '2-digit' 
+            });
+            
+            let orderTypeStr = diningType;
+            let locationText = "";
+
+            if (diningType === 'Dine In') {
+                if (!selectedTable) {
+                    alert('Please select a table number from the list!');
+                    return;
+                }
+                orderTypeStr = `Dine In (${selectedTable})`;
+            } else if (diningType === 'Takeaway') {
+                const addressInput = document.getElementById('delivery-address').value.trim();
+                
+                if (addressInput) {
+                    locationText = `\n📍 *Delivery Address:*\n${addressInput}\n`;
+                } else {
+                    const proceedWithoutAddress = confirm("You haven't entered a delivery address. Do you want to send the order anyway and share your location directly in WhatsApp?");
+                    if (!proceedWithoutAddress) return; 
+                    
+                    locationText = `\n📍 *Delivery Address:*\n(Will share via WhatsApp)\n`;
+                }
             }
+
+            let msg = `🧾 *NEW ORDER*\n`;
+            msg += `📅 Date: ${orderDate}\n`;
+            msg += `📍 Store: *${restaurantName}*\n`;
+            msg += `🍽️ Option: *${orderTypeStr}*\n`;
+            msg += `------------------------\n`;
+            
+            let subtotal = 0;
+            cart.forEach((item, index) => {
+                const itemPrice = parseFloat(item.price) || 0;
+                const total = itemPrice * item.qty;
+                subtotal += total;
+                msg += `${index + 1}. ${item.qty}x ${item.name} @ ${itemPrice.toFixed(2)} = ${total.toFixed(2)}\n`;
+            });
+            
+            msg += `------------------------\n`;
+            msg += `*Total Amount: ${subtotal.toFixed(2)} ${globalCurrency}*\n`;
+            msg += `_(Prices include VAT)_\n`;
+
+            if (locationText) {
+                msg += locationText;
+            }
+
+            closeCartModal();
+            
+            let phone = String(rawBranding.D).replace(/\D/g, '');
+            window.location.href = `https://api.whatsapp.com/send?phone=${phone}&text=${encodeURIComponent(msg)}`;
         }
 
         function renderSocialMedia() {
