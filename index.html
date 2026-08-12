@@ -2060,25 +2060,40 @@ document.getElementById('modalPrice').innerHTML = priceHtml;
         }
 
         function openWhatsApp() {
-            if (rawBranding.D) {
-                const url = getWhatsAppUrl(rawBranding.D, "");
-                window.open(url, '_blank');
+            if(rawBranding.D) {
+                let phone = String(rawBranding.D).replace(/\D/g, '');
+                window.open(`https://wa.me/${phone}`, '_blank');
             }
         }
 
         function openWhatsAppItem() {
-            if (!currentOpenItemId || !rawBranding.D) return;
-            const item = activeMenuData.find(i => i.id === currentOpenItemId);
-            const text = currentLang === 'en' 
-                ? `Hi, I would like to order: ${item.name} (${item.price}${globalCurrency})`
-                : `مرحباً، أود طلب: ${item.name} (${item.price}${globalCurrency})`;
+            if(!currentOpenItemId || !rawBranding.D) return;
+            const item = activeMenuData.find(i => String(i.id) === String(currentOpenItemId));
+            if(!item) return;
             
-            const url = getWhatsAppUrl(rawBranding.D, text);
-            window.open(url, '_blank');
+            const text = currentLang === 'en' 
+                ? `Hi, I would like to order: ${item.name} (${item.price} ${globalCurrency})`
+                : `مرحباً، أود طلب: ${item.name} (${item.price} ${globalCurrency})`;
+            
+            let phone = String(rawBranding.D).replace(/\D/g, '');
+            window.open(`https://wa.me/${phone}?text=${encodeURIComponent(text)}`, '_blank');
         }
 
-        function sendOrderViaWhatsApp() {
+        async function sendOrderViaWhatsApp() {
             if(cart.length === 0 || !rawBranding.D) return;
+            
+            // BLOCK GUESTS FROM ORDERING
+            if (!currentUser || !currentUser.email) {
+                alert("Please log in or register a free account to complete your order.");
+                closeCartModal();
+                setAuthMode('signup');
+                document.getElementById('authModal').classList.replace('hidden', 'flex');
+                return; 
+            }
+            
+            const btn = document.querySelector('button[onclick="sendOrderViaWhatsApp()"]');
+            if (btn.dataset.locked === "true") return; 
+            btn.dataset.locked = "true"; 
             
             const restaurantName = rawBranding.B || 'Our Store';
             const orderDate = new Date().toLocaleString('en-US', { 
@@ -2087,52 +2102,162 @@ document.getElementById('modalPrice').innerHTML = priceHtml;
             
             let orderTypeStr = diningType;
             let locationText = "";
+            let addressInput = "";
 
             if (diningType === 'Dine In') {
                 if (!selectedTable) {
                     alert('Please select a table number from the list!');
+                    btn.dataset.locked = "false"; 
                     return;
                 }
                 orderTypeStr = `Dine In (${selectedTable})`;
             } else if (diningType === 'Takeaway') {
-                const addressInput = document.getElementById('delivery-address').value.trim();
+                addressInput = document.getElementById('delivery-address').value.trim();
                 
                 if (addressInput) {
                     locationText = `\n📍 *Delivery Address:*\n${addressInput}\n`;
                 } else {
                     const proceedWithoutAddress = confirm("You haven't entered a delivery address. Do you want to send the order anyway and share your location directly in WhatsApp?");
-                    if (!proceedWithoutAddress) return; 
-                    
+                    if (!proceedWithoutAddress) {
+                        btn.dataset.locked = "false"; 
+                        return; 
+                    }
                     locationText = `\n📍 *Delivery Address:*\n(Will share via WhatsApp)\n`;
                 }
             }
 
-            let msg = `🧾 *NEW ORDER*\n`;
+            let subtotal = 0;
+            cart.forEach(item => {
+                subtotal += (parseFloat(item.price) || 0) * item.qty;
+            });
+
+            const customerName = document.getElementById('order-customer-name').value.trim();
+            const customerPhone = document.getElementById('order-customer-phone').value.trim();
+
+            if (!customerName || !customerPhone) {
+                alert('Please enter your Name and Phone Number so we can process your order!');
+                btn.dataset.locked = "false"; 
+                return;
+            }
+
+            const originalBtnHtml = btn.innerHTML;
+            btn.innerHTML = `<i class="fas fa-spinner fa-spin text-2xl"></i> Processing...`;
+
+            // LIVE INVENTORY VERIFICATION
+            for (const cartItem of cart) {
+                if (cartItem.stockQty !== null && cartItem.stockQty !== undefined) {
+                    const { data: liveData } = await supabaseClient
+                        .from('menu_items')
+                        .select('stock_quantity')
+                        .eq('item_code', cartItem.itemCode)
+                        .limit(1)
+                        .maybeSingle();
+
+                    if (liveData && liveData.stock_quantity !== null) {
+                        const liveStock = Number(liveData.stock_quantity);
+                        const orderQty = Number(cartItem.qty);
+
+                        if (liveStock < orderQty) {
+                            alert(`🚨 Oops! Another customer just bought ${cartItem.name}. Only ${liveStock} left in stock! Please adjust your cart.`);
+                            btn.dataset.locked = "false"; 
+                            btn.innerHTML = originalBtnHtml; 
+                            fetchMenuDataForLang(currentLang);
+                            return; 
+                        }
+                        cartItem.liveStock = liveStock;
+                    }
+                }
+            }
+
+            let uniqueOrderNo = 'ORD-0125'; 
+            try {
+                const { data: lastOrder } = await supabaseClient
+                    .from('orders')
+                    .select('order_number')
+                    .not('order_number', 'is', null)
+                    .order('created_at', { ascending: false })
+                    .limit(1)
+                    .maybeSingle();
+
+                if (lastOrder && lastOrder.order_number) {
+                    const lastNum = parseInt(lastOrder.order_number.replace('ORD-', ''));
+                    if (!isNaN(lastNum)) {
+                        uniqueOrderNo = 'ORD-' + String(lastNum + 1).padStart(4, '0');
+                    }
+                }
+            } catch (e) {
+                console.error("Order number generation error:", e);
+                uniqueOrderNo = 'ORD-' + String(Math.floor(1000 + Math.random() * 9000)); 
+            }
+
+            try {
+                const { error } = await supabaseClient
+                    .from('orders')
+                    .insert([{
+                        order_number: uniqueOrderNo, 
+                        customer_id: currentUser ? currentUser.id : 'guest',
+                        customer_name: customerName,
+                        customer_phone: customerPhone,
+                        customer_email: currentUser ? currentUser.email : null,
+                        order_type: diningType,
+                        table_number: diningType === 'Dine In' ? selectedTable : null,
+                        delivery_address: addressInput || null,
+                        items: cart,
+                        total_amount: subtotal,
+                        status: 'Pending'
+                    }]);
+
+                btn.innerHTML = originalBtnHtml;
+
+                if (!error) {
+                    for (const cartItem of cart) {
+                        if (cartItem.liveStock !== undefined) {
+                            const newStock = Math.max(0, cartItem.liveStock - cartItem.qty);
+                            await supabaseClient
+                                .from('menu_items')
+                                .update({ stock_quantity: newStock })
+                                .eq('item_code', cartItem.itemCode);
+                        }
+                    }
+                }
+            } catch (err) {
+                console.error("System Error:", err);
+            }
+
+            btn.dataset.locked = "false"; 
+
+            let msg = `🧾 *NEW ORDER (${uniqueOrderNo})*\n`; 
+            msg += `👤 Name: *${customerName}*\n`;
+            msg += `📞 Phone: ${customerPhone}\n`;
             msg += `📅 Date: ${orderDate}\n`;
             msg += `📍 Store: *${restaurantName}*\n`;
             msg += `🍽️ Option: *${orderTypeStr}*\n`;
             msg += `------------------------\n`;
             
-            let subtotal = 0;
             cart.forEach((item, index) => {
                 const itemPrice = parseFloat(item.price) || 0;
                 const total = itemPrice * item.qty;
-                subtotal += total;
                 msg += `${index + 1}. ${item.qty}x ${item.name} @ ${itemPrice.toFixed(2)} = ${total.toFixed(2)}\n`;
             });
             
+            const vatAmount = subtotal * VAT_RATE;
+            const netTotal = subtotal + vatAmount;
+
             msg += `------------------------\n`;
-            msg += `*Total Amount: ${subtotal.toFixed(2)} ${globalCurrency}*\n`;
-            msg += `_(Prices include VAT)_\n`;
+            msg += `Subtotal: ${subtotal.toFixed(2)}\n`;
+            msg += `VAT (15%): ${vatAmount.toFixed(2)}\n`;
+            msg += `*Net Total: ${netTotal.toFixed(2)} ${globalCurrency}*\n`;
 
             if (locationText) {
                 msg += locationText;
             }
 
             closeCartModal();
-            
-            const finalUrl = getWhatsAppUrl(rawBranding.D, msg);
-            window.open(finalUrl, '_blank');
+            cart = [];
+            updateCartUI();
+
+            let phone = String(rawBranding.D).replace(/\D/g, '');
+            window.open(`https://wa.me/${phone}?text=${encodeURIComponent(msg)}`, '_blank');
         }
 
         function renderSocialMedia() {
