@@ -1371,7 +1371,7 @@
             document.getElementById('label-wa').textContent = t.wa;
             document.getElementById('label-share').textContent = t.share;
 
-            const delCharge = rawBranding.smartDelivery ? `${rawBranding.smartDelivery} ${globalCurrency}` : 'Free';
+            const delCharge = rawBranding.smartDelivery ? `${rawBranding.smartDelivery}` : 'Free';
             document.getElementById('modalDeliveryText').textContent = `${t.deliveryPrefix} ${delCharge}`;
 
             let modalCurrencyDisplay = getSmartCurrency(globalCurrency, "text-sm md:text-base font-normal mx-1 text-red-400");
