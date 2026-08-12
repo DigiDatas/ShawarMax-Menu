@@ -573,18 +573,11 @@
                 </div>
 
                 <!-- Calculations -->
+                <!-- Calculations (VAT Inclusive) -->
                 <div class="space-y-2 mb-4 text-sm font-medium text-gray-600">
-                    <div class="flex justify-between">
-                        <span>Subtotal:</span>
-                        <span id="cart-subtotal">0.00</span>
-                    </div>
-                    <div class="flex justify-between text-red-500">
-                        <span>VAT (15%):</span>
-                        <span id="cart-vat">0.00</span>
-                    </div>
                     <div class="flex justify-between text-xl font-extrabold text-gray-900 border-t border-gray-200 pt-2 mt-2">
-                        <span>Net Total:</span>
-                        <span id="cart-total">0.00</span>
+                        <span>Total <span class="text-[10px] font-normal text-gray-400">(VAT Inclusive)</span>:</span>
+                        <span id="cart-total" class="flex items-baseline gap-1">0.00</span>
                     </div>
                 </div>
 
@@ -702,7 +695,7 @@ let relatedItemsData = []; // (You did this perfectly!)
             try {
                 // Point directly to the JSON file
                 const fileUrl = "https://raw.githubusercontent.com/DigiDatas/ShawarMax-Menu/main/MenuMasterData.json?v=" + new Date().getTime();
-                const response = await fetch(fileUrl);
+                const response = await fetch(fileUrl, { cache: "no-store", pragma: "no-cache" });
                 if (!response.ok) throw new Error("Could not fetch JSON file");
                 
                 // Natively parse the JSON data (Extremely Fast!)
@@ -914,8 +907,8 @@ let relatedItemsData = []; // (You did this perfectly!)
                         <span class="text-sm sm:text-base font-medium text-red-50 text-center mb-2">${offer.C || ""}</span>
                         ${(offer.D || offer.E) ? `
                         <div class="flex items-center gap-3 bg-black/40 px-5 py-2 rounded-full border border-white/10 mt-auto">
-                            ${offer.D ? `<span class="line-through text-red-200 text-sm font-medium">${offer.D} ${globalCurrency}</span>` : ''}
-                            ${offer.E ? `<span class="font-extrabold text-2xl text-yellow-300 drop-shadow-md">${offer.E} ${globalCurrency}</span>` : ''}
+                            ${offer.D ? `<span class="line-through text-red-200 text-sm font-medium flex items-baseline gap-1">${offer.D} ${getSmartCurrency(globalCurrency, '')}</span>` : ''}
+                            ${offer.E ? `<span class="font-extrabold text-2xl text-yellow-300 drop-shadow-md flex items-baseline gap-1">${offer.E} ${getSmartCurrency(globalCurrency, '')}</span>` : ''}
                         </div>` : ''}
                     </div>
                 `;
@@ -2064,14 +2057,14 @@ document.getElementById('modalPrice').innerHTML = priceHtml;
                 subtotal += total;
                 msg += `${index + 1}. ${item.qty}x ${item.name} @ ${itemPrice.toFixed(2)} = ${total.toFixed(2)}\n`;
             });
-            
-            const vatAmount = subtotal * VAT_RATE;
-            const netTotal = subtotal + vatAmount;
 
             msg += `------------------------\n`;
-            msg += `Subtotal: ${subtotal.toFixed(2)}\n`;
-            msg += `VAT (15%): ${vatAmount.toFixed(2)}\n`;
-            msg += `*Net Total: ${netTotal.toFixed(2)} ${globalCurrency}*\n`;
+            msg += `*Total Amount: ${subtotal.toFixed(2)} ${globalCurrency}*\n`;
+            msg += `_(Prices include VAT)_\n`;
+
+            if (locationText) {
+                msg += locationText;
+            }
 
             closeCartModal();
 
@@ -2479,14 +2472,10 @@ function toggleQuickCart(id) {
                 `;
             });
 
-            // Calculate Totals
-            const vatAmount = subtotal * VAT_RATE;
-            const netTotal = subtotal + vatAmount;
-
-            document.getElementById('cart-subtotal').innerText = `${subtotal.toFixed(2)} ${globalCurrency}`;
-            document.getElementById('cart-vat').innerText = `${vatAmount.toFixed(2)} ${globalCurrency}`;
-            document.getElementById('cart-total').innerText = `${netTotal.toFixed(2)} ${globalCurrency}`;
-          updateQuickAddButtons();
+            // Calculate Totals (VAT Inclusive & Custom Currency)
+            document.getElementById('cart-total').innerHTML = `${subtotal.toFixed(2)} ${getSmartCurrency(globalCurrency, 'ms-1')}`;
+            
+            updateQuickAddButtons();
         }
 
         function changeQty(id, change) {
@@ -3199,14 +3188,39 @@ function toggleQuickCart(id) {
         window.onload = init;
         setupSearch(); 
 
-        // --- Register PWA Service Worker ---
+        
+        // --- Smart Auto-Updating PWA Service Worker ---
         if ('serviceWorker' in navigator) {
             window.addEventListener('load', () => {
                 navigator.serviceWorker.register('https://raw.githubusercontent.com/DigiDatas/ShawarMax-Menu/main/sw.js')
-                    .then(reg => console.log('PWA Service Worker registered successfully!'))
+                    .then(reg => {
+                        console.log('PWA Service Worker registered successfully!');
+                        // 1. Force the Service Worker to actively check for new files!
+                        reg.update();
+                        
+                        // 2. If a new version is found, force the browser to use it immediately!
+                        reg.onupdatefound = () => {
+                            const installingWorker = reg.installing;
+                            if (installingWorker) {
+                                installingWorker.onstatechange = () => {
+                                    if (installingWorker.state === 'installed' && navigator.serviceWorker.controller) {
+                                        console.log("New update found! Refreshing to apply changes...");
+                                        window.location.reload();
+                                    }
+                                };
+                            }
+                        };
+                    })
                     .catch(err => console.error('PWA Registration failed:', err));
             });
         }
+
+        // Safety feature: Force reload if the phone tries to load the page from "Back Button" memory
+        window.addEventListener('pageshow', function (event) {
+            if (event.persisted) {
+                window.location.reload();
+            }
+        });
     </script>
 </body>
 </html>
