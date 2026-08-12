@@ -3,8 +3,8 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Shawar Max Menu</title>
-  <link rel="manifest" href="manifest.json">
+    <title>Shawarmax Menu</title>
+  <link rel="manifest" href="https://raw.githubusercontent.com/DigiDatas/ShawarMax-Menu/main/manifest.json">
     <meta name="theme-color" content="#ef4444">
     <link rel="apple-touch-icon" href="logo.png">
     <meta name="apple-mobile-web-app-capable" content="yes">
@@ -457,8 +457,8 @@
                 <div class="absolute inset-0 bg-gradient-to-b from-white/10 to-transparent pointer-events-none"></div>
                 
                 <!-- Big Round Logo Container -->
-                <div class="w-36 h-36 sm:w-44 sm:h-44 bg-white rounded-full shadow-2xl mb-4 relative z-10 flex items-center justify-center overflow-hidden border-4 border-white">
-                    <img id="brandModalImage" src="" class="w-full h-full object-cover hover:scale-110 transition-transform duration-500" alt="Brand Logo">
+                <div class="w-36 h-36 sm:w-44 sm:h-44 bg-white rounded-full p-4 shadow-2xl mb-4 relative z-10 flex items-center justify-center overflow-hidden">
+                    <img id="brandModalImage" src="" class="max-w-full max-h-full object-contain hover:scale-110 transition-transform duration-500" alt="Brand Logo">
                 </div>
                 
                 <!-- Centered Title under the Logo -->
@@ -566,28 +566,28 @@
                     <!-- Hidden Table Dropdown -->
                     <div id="table-select-container" class="hidden transition-all duration-300 mt-2">
                         <div class="text-[10px] font-bold text-gray-400 uppercase mb-2 text-center flex items-center gap-2 before:h-px before:flex-1 before:bg-gray-200 after:h-px after:flex-1 after:bg-gray-200">Select Table</div>
-                        <div id="table-grid" class="flex overflow-x-auto gap-1.5 pb-2 snap-x hide-scrollbar"></div>
-                    </div>
-
-                    <!-- NEW: Address Input for Delivery/Takeaway -->
-                    <div id="address-input-container" class="transition-all duration-300 mt-2">
-                        <div class="text-[10px] font-bold text-gray-400 uppercase mb-2 text-center flex items-center gap-2 before:h-px before:flex-1 before:bg-gray-200 after:h-px after:flex-1 after:bg-gray-200">Delivery Address</div>
-                        <div class="flex gap-2">
-                            <input type="text" id="delivery-address" placeholder="Type address or click GPS..." class="flex-1 border border-gray-200 rounded-lg px-3 py-2 text-xs font-medium text-gray-700 focus:outline-none focus:border-green-500 transition-colors">
-                            <button onclick="getGPSLocation()" id="gps-btn" class="w-9 h-9 shrink-0 bg-blue-50 text-blue-600 rounded-lg border border-blue-200 flex items-center justify-center hover:bg-blue-100 transition shadow-sm" title="Use My Current Location">
-                                <i class="fas fa-location-arrow"></i>
-                            </button>
-                        </div>
+                        
+                        <div id="table-grid" class="flex overflow-x-auto gap-1.5 pb-2 snap-x hide-scrollbar">
+                            </div>
                     </div>
                 </div>
 
-                <!-- Calculations (VAT Removed) -->
+                <!-- Calculations -->
                 <div class="space-y-2 mb-4 text-sm font-medium text-gray-600">
-                    <div class="flex justify-between text-xl font-extrabold text-gray-900 pt-2 mt-2">
-                        <span>Total <span class="text-[10px] font-normal text-gray-400">(VAT Inclusive)</span>:</span>
+                    <div class="flex justify-between">
+                        <span>Subtotal:</span>
+                        <span id="cart-subtotal">0.00</span>
+                    </div>
+                    <div class="flex justify-between text-red-500">
+                        <span>VAT (15%):</span>
+                        <span id="cart-vat">0.00</span>
+                    </div>
+                    <div class="flex justify-between text-xl font-extrabold text-gray-900 border-t border-gray-200 pt-2 mt-2">
+                        <span>Net Total:</span>
                         <span id="cart-total">0.00</span>
                     </div>
                 </div>
+
                 <!-- WhatsApp Order Button -->
                 <button onclick="sendOrderViaWhatsApp()" class="w-full bg-green-500 text-white text-center py-3.5 rounded-xl font-bold hover:bg-green-600 transition shadow-lg flex items-center justify-center gap-2 text-lg">
                     <i class="fab fa-whatsapp text-2xl"></i> Send Order
@@ -653,7 +653,6 @@
 
       
         // --- Core State ---
-const CUSTOMER_ID = "CS01-2026-08";
       let rawBranding = {};
 let rawOffers = [];
 let rawMenuEn = [];
@@ -701,48 +700,8 @@ let relatedItemsData = []; // (You did this perfectly!)
         /// --- Master Initialization (JSON Upgraded) ---
         async function init() {
             try {
-                // ==========================================
-                // 🔒 NEW: CLOUD SECURITY KILL-SWITCH
-                // ==========================================
-                try {
-                    const authUrl = "https://raw.githubusercontent.com/Rmoosa2014/Restaurant-menu/main/CustomerID.json?v=" + new Date().getTime();
-                    const authResponse = await fetch(authUrl);
-                    if (!authResponse.ok) throw new Error("Cannot reach security server");
-                    
-                    const authData = await authResponse.json();
-                    let isValidCustomer = false;
-                    
-                    // Search all sheets in the Security JSON for the Customer ID
-                    for (const sheet in authData) {
-                        const rows = authData[sheet];
-                        if (Array.isArray(rows)) {
-                            // Find row where Column C matches our ID
-                            const match = rows.find(row => String(row.C || "").trim() === String(CUSTOMER_ID).trim());
-                            
-                            // Check if matched row exists and Column E says "Active"
-                            if (match && String(match.E || "").trim().toLowerCase() === "active") {
-                                isValidCustomer = true;
-                                break;
-                            }
-                        }
-                    }
-
-                    if (!isValidCustomer) throw new Error("Not Active");
-
-                } catch (authError) {
-                    // Triggers if fetch fails, file is missing, ID is wrong, or status is not Active
-                    document.body.innerHTML = `
-                        <div style="display:flex; flex-direction:column; justify-content:center; align-items:center; height:100vh; background-color:#f8fafc; font-family:sans-serif; color:#ef4444; text-align:center; padding: 20px;">
-                            <i class="fas fa-store-slash text-6xl mb-4 text-gray-300"></i>
-                            <h2 class="text-3xl font-extrabold text-gray-800">Temporarily Not Available</h2>
-                            <p class="text-gray-500 mt-2 font-bold">This menu is currently inactive. Please contact the administrator.</p>
-                        </div>`;
-                    return; // Completely stops the app from loading!
-                }
-                // ==========================================
-
                 // Point directly to the JSON file
-                const fileUrl = "MenuMasterData.json?v=" + new Date().getTime();
+                const fileUrl = "https://raw.githubusercontent.com/DigiDatas/ShawarMax-Menu/main/MenuMasterData.json?v=" + new Date().getTime();
                 const response = await fetch(fileUrl);
                 if (!response.ok) throw new Error("Could not fetch JSON file");
                 
@@ -872,26 +831,14 @@ let relatedItemsData = []; // (You did this perfectly!)
             document.documentElement.dir = currentLang === 'ar' ? 'rtl' : 'ltr';
             document.documentElement.lang = currentLang;
 
-            // Smart Bilingual Brand Name (Row 2 for EN, Row 3 for AR)
-            let smartBrandName = "Our Restaurant";
-            if (window.rawBrandRows && window.rawBrandRows.length > 1) {
-                if (currentLang === 'en') {
-                    smartBrandName = window.rawBrandRows[1]['B'] || "Our Restaurant";
-                } else {
-                    smartBrandName = (window.rawBrandRows.length > 2 && window.rawBrandRows[2]['B']) ? window.rawBrandRows[2]['B'] : (window.rawBrandRows[1]['B'] || "مطعمنا");
-                }
-            } else {
-                smartBrandName = rawBranding.B || (currentLang === 'en' ? "Our Restaurant" : "مطعمنا");
-            }
-
             // 1. Update the top navigation bar and bottom footer
-            document.getElementById('nav-title').textContent = smartBrandName;
-            document.getElementById('footer-title').textContent = smartBrandName;
+            document.getElementById('nav-title').textContent = rawBranding.B || "My Restaurant";
+            document.getElementById('footer-title').textContent = rawBranding.B || "My Restaurant";
             
-            // 2. Properly split the Hero Header
+            // 2. FIX: Properly split the Hero Header so it says "Welcome to / [Brand Name]"
             const welcomeText = currentLang === 'en' ? "Welcome to" : "مرحباً بكم في";
             document.getElementById('hero-title1').textContent = welcomeText;
-            document.getElementById('hero-title2').textContent = smartBrandName;
+            document.getElementById('hero-title2').textContent = rawBranding.B || (currentLang === 'en' ? "Our Restaurant" : "مطعمنا");
             
             document.getElementById('f-phone').textContent = rawBranding.C || "--";
             document.getElementById('f-whatsapp').textContent = rawBranding.D || "--";
@@ -1081,7 +1028,6 @@ let relatedItemsData = []; // (You did this perfectly!)
         function formatMenuData(rawSource) {
             activeMenuData = [];
             mainCategories = [];
-            allSubCategories = []; // <--- THIS CLEARS THE OLD LANGUAGE
             const subCatGroups = {};
 
             rawSource.forEach(row => {
@@ -1942,7 +1888,7 @@ document.getElementById('modalPrice').innerHTML = priceHtml;
                         relatedSlider.innerHTML += `
                             <div class="relative w-[28vw] sm:w-[110px] flex-shrink-0 snap-start bg-orange-50 border border-orange-100 rounded-xl p-2 shadow-sm cursor-pointer hover:shadow-md transition-shadow">
                                 <div onclick="openModal('${relItem.id}')">
-                                    <img src="${relItem.img}" class="w-full h-16 object-cover rounded-lg mb-1.5" onerror="if(this.src.includes('.jpg')) { this.src=this.src.replace('.jpg', '.png'); } else if(this.src.includes('.png')) { this.src=this.src.replace('.png', '.jpeg'); } else { this.onerror=null; this.src='${rawBranding.smartLogo || 'https://raw.githubusercontent.com/DigiDatas/ShawarMax-Menu/main/logo.png'}'; }">
+                                    <img src="${relItem.img}" class="w-full h-16 object-cover rounded-lg mb-1.5">
                                     <h4 class="text-[10px] font-bold text-gray-800 line-clamp-1">${relItem.name}</h4>
                                 </div>
                                 <div class="flex justify-between items-center mt-1">
@@ -2042,243 +1988,42 @@ document.getElementById('modalPrice').innerHTML = priceHtml;
             if(rawBranding.C) window.location.href = `tel:${rawBranding.C}`;
         }
 
-        // --- BULLETPROOF UNIVERSAL WHATSAPP ROUTER ---
-        function getWhatsAppUrl(phone, text = "") {
-            let cleanPhone = String(phone).replace(/\D/g, '');
-            let encodedText = encodeURIComponent(text);
-
-            // Detect if the user is on a mobile device (iOS or Android)
-            const isMobile = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
-
-            if (isMobile) {
-                // Mobile: Use standard wa.me link which natively triggers the mobile app
-                return `https://wa.me/${cleanPhone}?text=${encodedText}`;
-            } else {
-                // Desktop: Use web.whatsapp.com directly so desktop browsers never hit a 404 error
-                return `https://web.whatsapp.com/send?phone=${cleanPhone}&text=${encodedText}`;
-            }
+        function openWhatsApp() {
+            if(rawBranding.D) window.open(`https://wa.me/${rawBranding.D}`, '_blank');
         }
 
         function openWhatsAppItem() {
             if(!currentOpenItemId || !rawBranding.D) return;
-            const item = activeMenuData.find(i => String(i.id) === String(currentOpenItemId));
-            if(!item) return;
-            
+            const item = activeMenuData.find(i => i.id === currentOpenItemId);
             const text = currentLang === 'en' 
-                ? `Hi, I would like to order: ${item.name} (${item.price} ${globalCurrency})`
-                : `مرحباً، أود طلب: ${item.name} (${item.price} ${globalCurrency})`;
-            
-            let phone = String(rawBranding.D).replace(/\D/g, '');
-            let link = document.createElement('a');
-            link.href = `https://wa.me/${phone}?text=${encodeURIComponent(text)}`;
-            link.target = '_blank';
-            document.body.appendChild(link);
-            link.click();
-            document.body.removeChild(link);
+                ? `Hi, I would like to order: ${item.name} (${item.price}${globalCurrency})`
+                : `مرحباً، أود طلب: ${item.name} (${item.price}${globalCurrency})`;
+            window.open(`https://wa.me/${rawBranding.D}?text=${encodeURIComponent(text)}`, '_blank');
         }
-
-        function openWhatsAppItem() {
-            if(!currentOpenItemId || !rawBranding.D) return;
-            const item = activeMenuData.find(i => String(i.id) === String(currentOpenItemId));
-            if(!item) return;
-            
-            const text = currentLang === 'en' 
-                ? `Hi, I would like to order: ${item.name} (${item.price} ${globalCurrency})`
-                : `مرحباً، أود طلب: ${item.name} (${item.price} ${globalCurrency})`;
-            
-            let phone = String(rawBranding.D).replace(/\D/g, '');
-            window.open(`https://wa.me/${phone}?text=${encodeURIComponent(text)}`, '_blank');
-        }
-
-        async function sendOrderViaWhatsApp() {
-            if(cart.length === 0 || !rawBranding.D) return;
-            
-            // BLOCK GUESTS FROM ORDERING
-            if (!currentUser || !currentUser.email) {
-                alert("Please log in or register a free account to complete your order.");
-                closeCartModal();
-                setAuthMode('signup');
-                document.getElementById('authModal').classList.replace('hidden', 'flex');
-                return; 
-            }
-            
-            const btn = document.querySelector('button[onclick="sendOrderViaWhatsApp()"]');
-            if (btn.dataset.locked === "true") return; 
-            btn.dataset.locked = "true"; 
-            
-            const restaurantName = rawBranding.B || 'Our Store';
-            const orderDate = new Date().toLocaleString('en-US', { 
-                day: '2-digit', month: 'short', year: 'numeric', hour: 'numeric', minute: '2-digit' 
-            });
-            
-            let orderTypeStr = diningType;
-            let locationText = "";
-            let addressInput = "";
-
-            if (diningType === 'Dine In') {
-                if (!selectedTable) {
-                    alert('Please select a table number from the list!');
-                    btn.dataset.locked = "false"; 
-                    return;
-                }
-                orderTypeStr = `Dine In (${selectedTable})`;
-            } else if (diningType === 'Takeaway') {
-                addressInput = document.getElementById('delivery-address').value.trim();
+function smartWhatsAppOrder() {
+            if (cart.length > 0) {
+                const isAlreadyInCart = cart.some(c => String(c.id) === String(currentOpenItemId));
                 
-                if (addressInput) {
-                    locationText = `\n📍 *Delivery Address:*\n${addressInput}\n`;
-                } else {
-                    const proceedWithoutAddress = confirm("You haven't entered a delivery address. Do you want to send the order anyway and share your location directly in WhatsApp?");
-                    if (!proceedWithoutAddress) {
-                        btn.dataset.locked = "false"; 
-                        return; 
-                    }
-                    locationText = `\n📍 *Delivery Address:*\n(Will share via WhatsApp)\n`;
+                if (!isAlreadyInCart) {
+                    addToCart();
                 }
+                
+                openCartModal();
+            } else {
+                openWhatsAppItem();
             }
-
-            let subtotal = 0;
-            cart.forEach(item => {
-                subtotal += (parseFloat(item.price) || 0) * item.qty;
-            });
-
-            const customerName = document.getElementById('order-customer-name').value.trim();
-            const customerPhone = document.getElementById('order-customer-phone').value.trim();
-
-            if (!customerName || !customerPhone) {
-                alert('Please enter your Name and Phone Number so we can process your order!');
-                btn.dataset.locked = "false"; 
-                return;
-            }
-
-            const originalBtnHtml = btn.innerHTML;
-            btn.innerHTML = `<i class="fas fa-spinner fa-spin text-2xl"></i> Processing...`;
-
-            // LIVE INVENTORY VERIFICATION
-            for (const cartItem of cart) {
-                if (cartItem.stockQty !== null && cartItem.stockQty !== undefined) {
-                    const { data: liveData } = await supabaseClient
-                        .from('menu_items')
-                        .select('stock_quantity')
-                        .eq('item_code', cartItem.itemCode)
-                        .limit(1)
-                        .maybeSingle();
-
-                    if (liveData && liveData.stock_quantity !== null) {
-                        const liveStock = Number(liveData.stock_quantity);
-                        const orderQty = Number(cartItem.qty);
-
-                        if (liveStock < orderQty) {
-                            alert(`🚨 Oops! Another customer just bought ${cartItem.name}. Only ${liveStock} left in stock! Please adjust your cart.`);
-                            btn.dataset.locked = "false"; 
-                            btn.innerHTML = originalBtnHtml; 
-                            fetchMenuDataForLang(currentLang);
-                            return; 
-                        }
-                        cartItem.liveStock = liveStock;
-                    }
-                }
-            }
-
-            let uniqueOrderNo = 'ORD-0125'; 
-            try {
-                const { data: lastOrder } = await supabaseClient
-                    .from('orders')
-                    .select('order_number')
-                    .not('order_number', 'is', null)
-                    .order('created_at', { ascending: false })
-                    .limit(1)
-                    .maybeSingle();
-
-                if (lastOrder && lastOrder.order_number) {
-                    const lastNum = parseInt(lastOrder.order_number.replace('ORD-', ''));
-                    if (!isNaN(lastNum)) {
-                        uniqueOrderNo = 'ORD-' + String(lastNum + 1).padStart(4, '0');
-                    }
-                }
-            } catch (e) {
-                console.error("Order number generation error:", e);
-                uniqueOrderNo = 'ORD-' + String(Math.floor(1000 + Math.random() * 9000)); 
-            }
-
-            try {
-                const { error } = await supabaseClient
-                    .from('orders')
-                    .insert([{
-                        order_number: uniqueOrderNo, 
-                        customer_id: currentUser ? currentUser.id : 'guest',
-                        customer_name: customerName,
-                        customer_phone: customerPhone,
-                        customer_email: currentUser ? currentUser.email : null,
-                        order_type: diningType,
-                        table_number: diningType === 'Dine In' ? selectedTable : null,
-                        delivery_address: addressInput || null,
-                        items: cart,
-                        total_amount: subtotal,
-                        status: 'Pending'
-                    }]);
-
-                btn.innerHTML = originalBtnHtml;
-
-                if (!error) {
-                    for (const cartItem of cart) {
-                        if (cartItem.liveStock !== undefined) {
-                            const newStock = Math.max(0, cartItem.liveStock - cartItem.qty);
-                            await supabaseClient
-                                .from('menu_items')
-                                .update({ stock_quantity: newStock })
-                                .eq('item_code', cartItem.itemCode);
-                        }
-                    }
-                }
-            } catch (err) {
-                console.error("System Error:", err);
-            }
-
-            btn.dataset.locked = "false"; 
-
-            let msg = `🧾 *NEW ORDER (${uniqueOrderNo})*\n`; 
-            msg += `👤 Name: *${customerName}*\n`;
-            msg += `📞 Phone: ${customerPhone}\n`;
-            msg += `📅 Date: ${orderDate}\n`;
-            msg += `📍 Store: *${restaurantName}*\n`;
-            msg += `🍽️ Option: *${orderTypeStr}*\n`;
-            msg += `------------------------\n`;
+        }        function shareItem() {
+            if (!currentOpenItemId) return;
+            const item = activeMenuData.find(i => i.id === currentOpenItemId);
+            const text = currentLang === 'en' 
+                ? `Check out ${item.name} at ${rawBranding.B || 'our restaurant'}! \n${window.location.href}`
+                : `شاهد ${item.name} في ${rawBranding.B || 'مطعمنا'}! \n${window.location.href}`;
             
-            cart.forEach((item, index) => {
-                const itemPrice = parseFloat(item.price) || 0;
-                const total = itemPrice * item.qty;
-                msg += `${index + 1}. ${item.qty}x ${item.name} @ ${itemPrice.toFixed(2)} = ${total.toFixed(2)}\n`;
-            });
-            
-            const vatAmount = subtotal * VAT_RATE;
-            const netTotal = subtotal + vatAmount;
-
-            msg += `------------------------\n`;
-            msg += `Subtotal: ${subtotal.toFixed(2)}\n`;
-            msg += `VAT (15%): ${vatAmount.toFixed(2)}\n`;
-            msg += `*Net Total: ${netTotal.toFixed(2)} ${globalCurrency}*\n`;
-
-            if (locationText) {
-                msg += locationText;
+            if (navigator.share) {
+                navigator.share({ title: item.name, text: text }).catch(console.error);
+            } else {
+                window.open(`https://wa.me/?text=${encodeURIComponent(text)}`, '_blank');
             }
-
-            closeCartModal();
-            
-            // 1. Scrub the phone number to fix the 404 error
-            let phone = String(rawBranding.D).replace(/\D/g, '');
-            let waUrl = `https://wa.me/${phone}?text=${encodeURIComponent(msg)}`;
-            
-            // 2. Create an invisible link and force a click to bypass async browser blocks!
-            let link = document.createElement('a');
-            link.href = waUrl;
-            link.target = '_blank';
-            document.body.appendChild(link);
-            link.click();
-            document.body.removeChild(link);
-            
-            cart = [];
-            updateCartUI();
         }
 
         function renderSocialMedia() {
@@ -2441,8 +2186,8 @@ let diningType = 'Takeaway';
                 `;
             }
         }
-      function setupDraggable(element) {
-            const slider = typeof element === 'string' ? document.getElementById(element) : element;
+      function setupDraggable(elementId) {
+            const slider = document.getElementById(elementId);
             if(!slider) return;
             let isDown = false;
             let startX;
@@ -2451,19 +2196,16 @@ let diningType = 'Takeaway';
             slider.addEventListener('mousedown', (e) => {
                 isDown = true;
                 slider.classList.add('cursor-grabbing');
-                slider.style.scrollSnapType = 'none'; // Disable snap while dragging
                 startX = e.pageX - slider.offsetLeft;
                 scrollLeft = slider.scrollLeft;
             });
             slider.addEventListener('mouseleave', () => {
                 isDown = false;
                 slider.classList.remove('cursor-grabbing');
-                slider.style.scrollSnapType = ''; // Restore snap
             });
             slider.addEventListener('mouseup', () => {
                 isDown = false;
                 slider.classList.remove('cursor-grabbing');
-                slider.style.scrollSnapType = ''; // Restore snap
             });
             slider.addEventListener('mousemove', (e) => {
                 if (!isDown) return;
@@ -2497,18 +2239,15 @@ let diningType = 'Takeaway';
             const btnTakeaway = document.getElementById('btn-type-takeaway');
             const btnDineIn = document.getElementById('btn-type-dinein');
             const tableContainer = document.getElementById('table-select-container');
-            const addressContainer = document.getElementById('address-input-container');
 
             if(type === 'Takeaway') {
                 btnTakeaway.className = "flex-1 py-2 rounded-lg border-2 border-green-500 bg-green-50 text-green-700 font-bold text-sm transition-all flex items-center justify-center gap-2 shadow-sm";
                 btnDineIn.className = "flex-1 py-2 rounded-lg border-2 border-gray-200 bg-white text-gray-500 font-bold text-sm transition-all flex items-center justify-center gap-2 hover:bg-gray-50";
-                if(tableContainer) tableContainer.classList.add('hidden'); // Hide tables
-                if(addressContainer) addressContainer.classList.remove('hidden'); // Show address box
+                tableContainer.classList.add('hidden'); // Hide dropdown
             } else {
                 btnDineIn.className = "flex-1 py-2 rounded-lg border-2 border-green-500 bg-green-50 text-green-700 font-bold text-sm transition-all flex items-center justify-center gap-2 shadow-sm";
                 btnTakeaway.className = "flex-1 py-2 rounded-lg border-2 border-gray-200 bg-white text-gray-500 font-bold text-sm transition-all flex items-center justify-center gap-2 hover:bg-gray-50";
-                if(tableContainer) tableContainer.classList.remove('hidden'); // Show tables
-                if(addressContainer) addressContainer.classList.add('hidden'); // Hide address box
+                tableContainer.classList.remove('hidden'); // Show dropdown
             }
         }
 
@@ -2642,9 +2381,14 @@ function toggleQuickCart(id) {
                 `;
             });
 
-            // Calculate Totals (VAT Removed)
-            document.getElementById('cart-total').innerText = `${subtotal.toFixed(2)} ${globalCurrency}`;
-            updateQuickAddButtons();
+            // Calculate Totals
+            const vatAmount = subtotal * VAT_RATE;
+            const netTotal = subtotal + vatAmount;
+
+            document.getElementById('cart-subtotal').innerText = `${subtotal.toFixed(2)} ${globalCurrency}`;
+            document.getElementById('cart-vat').innerText = `${vatAmount.toFixed(2)} ${globalCurrency}`;
+            document.getElementById('cart-total').innerText = `${netTotal.toFixed(2)} ${globalCurrency}`;
+          updateQuickAddButtons();
         }
 
         function changeQty(id, change) {
@@ -2694,75 +2438,30 @@ function toggleQuickCart(id) {
             document.body.style.overflow = '';
         }
 
-        // NEW: Allows the user to click the target icon to fill the input box with GPS
-        function getGPSLocation() {
-            if (navigator.geolocation) {
-                const btn = document.getElementById('gps-btn');
-                const input = document.getElementById('delivery-address');
-                const originalIcon = btn.innerHTML;
-                
-                btn.innerHTML = `<i class="fas fa-spinner fa-spin"></i>`;
-                
-                navigator.geolocation.getCurrentPosition(
-                    (position) => {
-                        const lat = position.coords.latitude;
-                        const lon = position.coords.longitude;
-                        input.value = `https://www.google.com/maps?q=${lat},${lon}`;
-                        btn.innerHTML = `<i class="fas fa-check text-green-600"></i>`;
-                        setTimeout(() => btn.innerHTML = originalIcon, 2000);
-                    },
-                    (error) => {
-                        alert('Location access denied or failed. Please type your address manually.');
-                        btn.innerHTML = originalIcon;
-                    },
-                    { enableHighAccuracy: true, timeout: 10000, maximumAge: 0 }
-                );
-            } else {
-                alert("Geolocation is not supported by your browser.");
-            }
-        }
-
-        // UPDATED: Reads the address box and removes VAT math
         function sendOrderViaWhatsApp() {
             if(cart.length === 0 || !rawBranding.D) return;
             
-            const restaurantName = rawBranding.B || 'Our Store';
+            const restaurantName = rawBranding.B || 'Our Restaurant';
+            
+            // --- NEW: Grab current date/time for the receipt ---
             const orderDate = new Date().toLocaleString('en-US', { 
                 day: '2-digit', month: 'short', year: 'numeric', hour: 'numeric', minute: '2-digit' 
             });
             
+            // Build the formatted text receipt using the new Dining Option variable
             let orderTypeStr = diningType;
-            let locationText = "";
-
             if (diningType === 'Dine In') {
                 if (!selectedTable) {
-                    alert('Please select a table number from the list!');
+                    alert('Please select a table number from the dropdown!');
                     return;
                 }
                 orderTypeStr = `Dine In (${selectedTable})`;
-            } else if (diningType === 'Takeaway') {
-                // Read whatever the user typed or pasted via GPS into the box
-                const addressInput = document.getElementById('delivery-address').value.trim();
-                
-                if (addressInput) {
-                    locationText = `\n📍 *Delivery Address:*\n${addressInput}\n`;
-                } else {
-                    // NEW: Smart confirmation if the address is empty
-                    const proceedWithoutAddress = confirm("You haven't entered a delivery address. Do you want to send the order anyway and share your location directly in WhatsApp?");
-                    
-                    if (!proceedWithoutAddress) {
-                        // User clicked Cancel, stop the order process so they can type it
-                        return; 
-                    }
-                    
-                    // User clicked OK, proceed with the order
-                    locationText = `\n📍 *Delivery Address:*\n(Will share via WhatsApp)\n`;
-                }
             }
 
+            // Build the formatted text receipt
             let msg = `🧾 *NEW ORDER*\n`;
             msg += `📅 Date: ${orderDate}\n`;
-            msg += `📍 Store: *${restaurantName}*\n`;
+            msg += `📍 Restaurant: *${restaurantName}*\n`;
             msg += `🍽️ Option: *${orderTypeStr}*\n`;
             msg += `------------------------\n`;
             
@@ -2774,16 +2473,17 @@ function toggleQuickCart(id) {
                 msg += `${index + 1}. ${item.qty}x ${item.name} @ ${itemPrice.toFixed(2)} = ${total.toFixed(2)}\n`;
             });
             
+            const vatAmount = subtotal * VAT_RATE;
+            const netTotal = subtotal + vatAmount;
+
             msg += `------------------------\n`;
-            msg += `*Total Amount: ${subtotal.toFixed(2)} ${globalCurrency}*\n`;
-            msg += `_(Prices include VAT)_\n`;
+            msg += `Subtotal: ${subtotal.toFixed(2)}\n`;
+            msg += `VAT (15%): ${vatAmount.toFixed(2)}\n`;
+            msg += `*Net Total: ${netTotal.toFixed(2)} ${globalCurrency}*\n`;
 
-            if (locationText) {
-                msg += locationText;
-            }
-
-            closeCartModal();
-            window.location.href = `https://wa.me/${rawBranding.D}?text=${encodeURIComponent(msg)}`;
+            // Redirect to WhatsApp
+            window.open(`https://wa.me/${rawBranding.D}?text=${encodeURIComponent(msg)}`, '_blank');
+            closeCartModal(); // Automatically close the bill
         }
 
         // --- REWORKED: DEDICATED CATEGORY POPUP LOGIC ---
@@ -3110,9 +2810,6 @@ function toggleQuickCart(id) {
                     
                     slider.dataset.infiniteSetup = "true";
                     slider.dataset.realCount = imgs.length;
-                    
-                    // Attach desktop dragging to all carousels automatically
-                    setupDraggable(slider);
 
                     // Kill old conflicting logic
                     slider.onscroll = null; 
@@ -3192,7 +2889,16 @@ function toggleQuickCart(id) {
         }
         setInterval(() => triggerAutoSwipe('.mini-img-slider'), 4000);
         setInterval(() => triggerAutoSwipe('.excel-banner-slider'), 5000);
-        
+        // --- NEW: Infinite Swipe Loop for All Carousels ---
+        let carouselSwipeStartX = 0;
+
+        document.addEventListener('touchstart', (e) => {
+            const slider = e.target.closest('.mini-img-slider, .excel-banner-slider, #modal-image-slider, #promo-slider');
+            if (slider && slider.children.length > 1) {
+                carouselSwipeStartX = e.touches[0].clientX;
+            }
+        }, { passive: true });
+
         document.addEventListener('touchend', (e) => {
             const slider = e.target.closest('.mini-img-slider, .excel-banner-slider, #modal-image-slider, #promo-slider');
             if (slider && slider.children.length > 1) {
@@ -3285,11 +2991,7 @@ function toggleQuickCart(id) {
             img.src = rawBranding.smartLogo || 'https://raw.githubusercontent.com/DigiDatas/ShawarMax-Menu/main/logo.png'; 
 
             // 2. Set Text Data from Excel
-            let smartBrandName = "Our Restaurant";
-            if (window.rawBrandRows && window.rawBrandRows.length > 1) {
-                smartBrandName = currentLang === 'en' ? (window.rawBrandRows[1]['B'] || "Our Restaurant") : ((window.rawBrandRows.length > 2 && window.rawBrandRows[2]['B']) ? window.rawBrandRows[2]['B'] : (window.rawBrandRows[1]['B'] || "مطعمنا"));
-            }
-            document.getElementById('brandModalTitle').textContent = smartBrandName;
+            document.getElementById('brandModalTitle').textContent = rawBranding.B || "Our Restaurant";
             
             const defaultDescEn = "Welcome to our restaurant! We pride ourselves on serving delicious, high-quality food made with fresh ingredients and authentic recipes.";
             const defaultDescAr = "مرحباً بكم في مطعمنا! نفخر بتقديم أشهى المأكولات عالية الجودة المحضرة بمكونات طازجة ووصفات أصيلة.";
@@ -3448,7 +3150,7 @@ function toggleQuickCart(id) {
         // --- Register PWA Service Worker ---
         if ('serviceWorker' in navigator) {
             window.addEventListener('load', () => {
-                navigator.serviceWorker.register('sw.js')
+                navigator.serviceWorker.register('https://raw.githubusercontent.com/DigiDatas/ShawarMax-Menu/main/sw.js')
                     .then(reg => console.log('PWA Service Worker registered successfully!'))
                     .catch(err => console.error('PWA Registration failed:', err));
             });
