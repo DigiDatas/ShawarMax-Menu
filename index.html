@@ -2061,6 +2061,7 @@ document.getElementById('modalPrice').innerHTML = priceHtml;
 
         function openWhatsApp() {
             if(rawBranding.D) {
+                // Strips all hidden symbols, slashes, or spaces from the database number
                 let phone = String(rawBranding.D).replace(/\D/g, '');
                 window.open(`https://wa.me/${phone}`, '_blank');
             }
@@ -2253,11 +2254,15 @@ document.getElementById('modalPrice').innerHTML = priceHtml;
             }
 
             closeCartModal();
+            
+            // 1. Scrub the phone number to fix the 404 error
+            let phone = String(rawBranding.D).replace(/\D/g, '');
+            
+            // 2. Use window.open to bypass the async browser block!
+            window.open(`https://wa.me/${phone}?text=${encodeURIComponent(msg)}`, '_blank');
+            
             cart = [];
             updateCartUI();
-
-            let phone = String(rawBranding.D).replace(/\D/g, '');
-            window.open(`https://wa.me/${phone}?text=${encodeURIComponent(msg)}`, '_blank');
         }
 
         function renderSocialMedia() {
