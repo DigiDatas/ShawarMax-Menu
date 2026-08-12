@@ -2044,10 +2044,8 @@ document.getElementById('modalPrice').innerHTML = priceHtml;
 
         function openWhatsApp() {
             if (rawBranding.D) {
-                // Clean the phone number (remove any spaces, plus signs, or dashes)
                 let phone = String(rawBranding.D).replace(/\D/g, '');
-                // Use the universal API link format that works on all mobile devices
-                window.open(`https://api.whatsapp.com/send?phone=${phone}`, '_blank');
+                window.open(`https://wa.me/${phone}`, '_blank');
             }
         }
 
@@ -2059,7 +2057,7 @@ document.getElementById('modalPrice').innerHTML = priceHtml;
                 : `مرحباً، أود طلب: ${item.name} (${item.price}${globalCurrency})`;
             
             let phone = String(rawBranding.D).replace(/\D/g, '');
-            window.open(`https://api.whatsapp.com/send?phone=${phone}&text=${encodeURIComponent(text)}`, '_blank');
+            window.open(`https://wa.me/${phone}?text=${encodeURIComponent(text)}`, '_blank');
         }
 
         function sendOrderViaWhatsApp() {
@@ -2117,7 +2115,7 @@ document.getElementById('modalPrice').innerHTML = priceHtml;
             closeCartModal();
             
             let phone = String(rawBranding.D).replace(/\D/g, '');
-            window.location.href = `https://api.whatsapp.com/send?phone=${phone}&text=${encodeURIComponent(msg)}`;
+            window.location.href = `https://wa.me/${phone}?text=${encodeURIComponent(msg)}`;
         }
 
         function renderSocialMedia() {
@@ -3220,6 +3218,7 @@ function toggleQuickCart(id) {
                 window.open(`https://wa.me/?text=${encodeURIComponent(text)}`, '_blank');
             }
         }
+
         function setupBrandPullToClose() {
             const pModal = document.getElementById('brandModal');
             const pContent = document.getElementById('brandModalContent');
