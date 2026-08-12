@@ -2042,10 +2042,28 @@ document.getElementById('modalPrice').innerHTML = priceHtml;
             if(rawBranding.C) window.location.href = `tel:${rawBranding.C}`;
         }
 
+        // --- UNIVERSAL DEVICE-AWARE WHATSAPP ROUTER ---
+        function getWhatsAppUrl(phone, text = "") {
+            // Clean the phone number (digits only, e.g., 966550924124)
+            let cleanPhone = String(phone).replace(/\D/g, '');
+            let encodedText = encodeURIComponent(text);
+
+            // Check if the user is on a mobile device (iOS or Android)
+            const isMobile = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
+
+            if (isMobile) {
+                // Mobile: Use the native app scheme. This bypasses browser redirects and 404 errors entirely!
+                return `https://api.whatsapp.com/send?phone=${cleanPhone}&text=${encodedText}`;
+            } else {
+                // Desktop: Use WhatsApp Web directly so it never hits a broken mobile redirect or 404 page
+                return `https://web.whatsapp.com/send?phone=${cleanPhone}&text=${encodedText}`;
+            }
+        }
+
         function openWhatsApp() {
             if (rawBranding.D) {
-                let phone = String(rawBranding.D).replace(/\D/g, '');
-                window.open(`https://wa.me/${phone}`, '_blank');
+                const url = getWhatsAppUrl(rawBranding.D, "");
+                window.open(url, '_blank');
             }
         }
 
@@ -2056,8 +2074,8 @@ document.getElementById('modalPrice').innerHTML = priceHtml;
                 ? `Hi, I would like to order: ${item.name} (${item.price}${globalCurrency})`
                 : `مرحباً، أود طلب: ${item.name} (${item.price}${globalCurrency})`;
             
-            let phone = String(rawBranding.D).replace(/\D/g, '');
-            window.open(`https://wa.me/${phone}?text=${encodeURIComponent(text)}`, '_blank');
+            const url = getWhatsAppUrl(rawBranding.D, text);
+            window.open(url, '_blank');
         }
 
         function sendOrderViaWhatsApp() {
@@ -2114,8 +2132,8 @@ document.getElementById('modalPrice').innerHTML = priceHtml;
 
             closeCartModal();
             
-            let phone = String(rawBranding.D).replace(/\D/g, '');
-            window.location.href = `https://wa.me/${phone}?text=${encodeURIComponent(msg)}`;
+            const finalUrl = getWhatsAppUrl(rawBranding.D, msg);
+            window.open(finalUrl, '_blank'); // Changed from window.location.href to window.open to prevent empty window hanging or 404 redirect blocks
         }
 
         function renderSocialMedia() {
