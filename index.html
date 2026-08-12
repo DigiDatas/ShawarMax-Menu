@@ -2059,12 +2059,22 @@ document.getElementById('modalPrice').innerHTML = priceHtml;
             }
         }
 
-        function openWhatsApp() {
-            if(rawBranding.D) {
-                // Strips all hidden symbols, slashes, or spaces from the database number
-                let phone = String(rawBranding.D).replace(/\D/g, '');
-                window.open(`https://wa.me/${phone}`, '_blank');
-            }
+        function openWhatsAppItem() {
+            if(!currentOpenItemId || !rawBranding.D) return;
+            const item = activeMenuData.find(i => String(i.id) === String(currentOpenItemId));
+            if(!item) return;
+            
+            const text = currentLang === 'en' 
+                ? `Hi, I would like to order: ${item.name} (${item.price} ${globalCurrency})`
+                : `مرحباً، أود طلب: ${item.name} (${item.price} ${globalCurrency})`;
+            
+            let phone = String(rawBranding.D).replace(/\D/g, '');
+            let link = document.createElement('a');
+            link.href = `https://wa.me/${phone}?text=${encodeURIComponent(text)}`;
+            link.target = '_blank';
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
         }
 
         function openWhatsAppItem() {
@@ -2257,9 +2267,15 @@ document.getElementById('modalPrice').innerHTML = priceHtml;
             
             // 1. Scrub the phone number to fix the 404 error
             let phone = String(rawBranding.D).replace(/\D/g, '');
+            let waUrl = `https://wa.me/${phone}?text=${encodeURIComponent(msg)}`;
             
-            // 2. Use window.open to bypass the async browser block!
-            window.open(`https://wa.me/${phone}?text=${encodeURIComponent(msg)}`, '_blank');
+            // 2. Create an invisible link and force a click to bypass async browser blocks!
+            let link = document.createElement('a');
+            link.href = waUrl;
+            link.target = '_blank';
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
             
             cart = [];
             updateCartUI();
